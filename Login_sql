@@ -1,0 +1,99 @@
+#Fortin & Trivellato
+#Script che simula un Login (Username & Password & Captcha)
+#Max 3 tentativi
+# MySQL
+# CONNESSIONE MySQL Connector/Python
+# Database smaca
+
+import os
+import random 
+import mysql.connector                          # Libreria connettore MySQL
+   
+
+db = mysql.connector.connect( # Connessione al DBMS
+ user= '5ai-zerbo',
+ password= '5ai-zerbo',
+ host= '192.168.5.37',
+ database= '5ai-polveni')
+
+cursorDB = db.cursor()      # Creazione puntatore (cursor)
+                      
+
+query = "SELECT * FROM Login"         
+
+cursorDB.execute(query)      # Esecuzione della query
+result = cursorDB.fetchall()
+
+
+for i in result:   #Visualizzazione query
+    print(i)      
+
+
+print("===========================================================")
+
+#----------------------------------------------------------
+#SIMULAZIONE LOGIN (Username e Password)
+
+username = str(input("Inserisci l'username: "))   
+password = str(input("Inserisci la password: "))  
+
+for i in range(2):
+    controllo = username in result[i]
+   
+    
+    if(controllo == True):                         #controllo username                   
+        controllo = password in result[i]
+        
+        
+        if(controllo == True):                      #controllo password 
+            break
+
+    controllo==False
+
+#---------------------------------------------------------------------------------------------
+#SIMULAZIONE CAPTCHA
+
+captcha = {     #liste captcha
+    "1":"A12D",
+    "2":"B2C1",
+    "3":"1SW3",}
+
+x=random.randint(1,3)
+
+
+
+if(controllo==True):
+    controllo=False
+    print("captcha = "+captcha[str(x)])
+    verifica_utente = str(input("inserisci il captcha: "))    #Inserimento Captcha
+
+    if(captcha[str(x)]==verifica_utente):
+        controllo=True                                 #inserimento corretto
+
+#---------------------------------------------------------------------------------------------
+#VISUALIZZAZIONE DATI
+
+if(controllo==True):  #Autentificazione captcha
+     
+
+        query= "SELECT * FROM Login,Cliente WHERE (Login.IDCliente=Cliente.IDCliente) AND (Login.Username='{}')"
+        
+        cursorDB.execute(query.format(username))      # Esecuzione della query
+        result = cursorDB.fetchone()
+        
+        array=['cognome','Nome','Codice Fiscale','Via Residenza','Numero civico','Comune','Provincia','Regione','Provincia','Email']
+        x=0
+        y=0
+        for i in result:
+            if(x>=8):
+                print(str(array[y])+" = "+str(i))
+                y=y+1
+            x=x+1
+            
+
+
+if(controllo==False):
+    print('l\'autenticazione non andata a buon fine')    
+    
+    
+    
